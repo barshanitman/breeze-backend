@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_engine.Models;
 
@@ -9,9 +10,9 @@ public partial class FinancialYear:IBaseEntity
 
     public string Name { get; set; } = null!;
 
-    public int CalendarYear { get; set; }
+    public List<TearSheetOutput> TearSheetOutputs { get; set; } = new List<TearSheetOutput>();
 
-    public bool Active { get; set; }
+    public List<DriverTearSheetOutput> DriverTearSheetOutputs { get; set; } = new List<DriverTearSheetOutput>();
 
-    public virtual ICollection<StockTearSheetOutput> StockTearSheetOutputs { get; } = new List<StockTearSheetOutput>();
 }
+

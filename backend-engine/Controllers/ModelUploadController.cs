@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using System.Text;
 using backend_engine.RequestBodies;
 using backend_engine.Repositories;
+using Microsoft.Extensions.Caching.Memory;
+using GemBox.Spreadsheet;
 
 namespace backend_engine.Controllers
 {
@@ -17,55 +19,76 @@ namespace backend_engine.Controllers
 	{
         private const string connectionString = "DefaultEndpointsProtocol=https;AccountName=hermesworkbooks;AccountKey=EaVNOEBoTyhe+S330Ec670TN0WlqHPdBNJ+Yp6eUB0q1XWGrpl/xE5GH0aVciVey42PRn+ZZSP0l+AStM9JbHg==;EndpointSuffix=core.windows.net";
         private const string containerName = "hermes-workbooks";
+		private readonly IRepository<StockUpload> _stockUploadRepo;
+		private readonly IRepository<TearSheetOutput> _tearSheetOutputRepo;
+		private readonly IRepository<StockUploadTearsheetValue> _stockUploadTearSheetValueRepo;
 
-	private readonly IRepository<Stock> _stockRepo;
-	private readonly IRepository<StockUpload> _stockUploadRepo;
-    private readonly ILogger<ModelUploadController> _logger;
+		private readonly IMemoryCache _memoryCache;
 
-	public ModelUploadController(ILogger<ModelUploadController> logger, IRepository<Stock> stockRepo, IRepository<StockUpload>stockUploadRepo)
+        private readonly BreezeDataContext _context;
+		private readonly ILogger<ModelUploadController> _logger;
+
+		private readonly IAddDriverStockUploadService _addDriverStockUploadService;
+
+
+	public ModelUploadController(ILogger<ModelUploadController> logger, IRepository<StockUpload> stockUploadRepo, 
+		IAddDriverStockUploadService addDriverStockUploadService,
+	IMemoryCache memoryCache, IRepository<TearSheetOutput> tearSheetOutputRepo, IRepository<StockUploadTearsheetValue>stockUploadTearSheetValueRepo, BreezeDataContext context)
 
 		{
-
+			_stockUploadRepo = stockUploadRepo;
+			_memoryCache = memoryCache;
 			_logger = logger;
-		    _stockRepo = stockRepo;
-		    _stockUploadRepo = stockUploadRepo;
-
+			_tearSheetOutputRepo = tearSheetOutputRepo;
+			_stockUploadTearSheetValueRepo = stockUploadTearSheetValueRepo;
+			_context = context;
+			_addDriverStockUploadService = addDriverStockUploadService;
 
 		}
 
+
 		[HttpPost]
 		[Route("upload")]
-		public async Task<IActionResult> Upload(IFormFile file) 
+		public async Task<IActionResult> Upload(IFormFile file, IFormCollection data) 
 	{
+			var uniqueFileName =  data["uniqueFileName"].ToString();
+
+
 			BlobContainerClient blobContainerClient = new BlobContainerClient(connectionString, containerName);
 
-			string fileName = Guid.NewGuid().ToString() +  file.FileName;
+			SpreadsheetInfo.SetLicense("SN-2022Dec14-8dsaQkUuOJsK9mB7z329lSTP9Re69lgZv8e3hfz7b8MeGQ89HmAgjhHwkBr7fW0CagUGOTdUhyb5AAd/RQTCPShAtug==A");
+
+			//Creating unique workbook name
+			//string fileName = Guid.NewGuid() +  file.FileName;
 			using(var stream = new MemoryStream()) 
 	    {
+
 				file.CopyTo(stream);
+				ExcelFile workbook = ExcelFile.Load(stream);
+                workbook = PreprocessWorkbook.PreProcessFile(workbook);
+                _memoryCache.Set(uniqueFileName, workbook, TimeSpan.FromHours(24));
 				stream.Position = 0;
-				blobContainerClient.UploadBlob(fileName,stream);
+				blobContainerClient.UploadBlob(uniqueFileName,stream);
 				stream.Close();
 	    
 	    }
-			Stock newStock = new Stock();
-		    newStock.Name = fileName.Remove(fileName.Length - 5);
-			newStock.Code = newStock.Name;
-			Stock res = _stockRepo.Add(newStock);
-			await _stockRepo.SaveChanges();
-			StockUpload newStockUpload = new StockUpload();
-			newStockUpload.FileName = fileName;
-			newStockUpload.StockId = (int)res.Id;
 
-			StockUpload resStockUpload = _stockUploadRepo.Add(newStockUpload);
-			await _stockUploadRepo.SaveChanges();
-            
-            return Ok(res);
+			ExcelFile retrievedWorkbook = _memoryCache.Get<ExcelFile>(uniqueFileName);
+			StockUpload retrievedStockUpload = _context.StockUploads.Where(x => x.FileName == uniqueFileName).First();
+		
+			_addDriverStockUploadService.AddDriversToStockUpload(retrievedWorkbook,retrievedStockUpload.Id, "Tearsheet template");
+
+			return Ok();
+
+	    }
+
+
+
+	}
+
 
 
 	}
 
        
-    }
-}
 

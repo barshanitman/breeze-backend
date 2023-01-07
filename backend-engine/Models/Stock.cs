@@ -9,7 +9,10 @@ public partial class Stock:IBaseEntity
 
     public string Name { get; set; } = null!;
 
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+
     public string Code { get; set; } = null!;
 
-    public virtual ICollection<StockUpload> StockUploads { get; } = new List<StockUpload>();
+    public List<StockUpload> StockUploads { get; set; } = new List<StockUpload>();
+
 }

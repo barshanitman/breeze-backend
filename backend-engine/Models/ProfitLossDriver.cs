@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_engine.Models;
 
@@ -7,19 +8,20 @@ public partial class ProfitLossDriver:IBaseEntity
 {
     public int Id { get; set; }
 
+    [ForeignKey(nameof(StockUploadId))]
     public int StockUploadId { get; set; }
 
-    public string InputName { get; set; } = null!;
+    public string InputName { get; set; } 
 
-    public string InputSheetReference { get; set; } = null!;
+    public string InputSheetReference { get; set; } 
 
-    public string InputCellReference { get; set; } = null!;
+    public string InputCellReference { get; set; } 
 
-    public string OutputName { get; set; } = null!;
+    public string OutputName { get; set; } 
 
-    public string OutputSheetReference { get; set; } = null!;
+    public string OutputSheetReference { get; set; } 
 
-    public string OutputCellReference { get; set; } = null!;
+    public string OutputCellReference { get; set; } 
 
-    public virtual StockUpload StockUpload { get; set; } = null!;
+
 }
