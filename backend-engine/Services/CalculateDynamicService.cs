@@ -16,62 +16,82 @@ namespace backend_engine.Services
 
         }
 
-        public static List<KeyValuePair<string, object>> CalculateFinancialYearTearSheet(List<TearSheetOutput> tearSheetMapping, ExcelFile workbook,int financialYearId)
+        public static List<KeyValuePair<string, object>> CalculateFinancialYearTearSheet(List<TearSheetOutput> tearSheetMapping, ExcelFile workbook, int financialYearId)
         {
 
             List<KeyValuePair<string, object>> results = new List<KeyValuePair<string, object>>();
+
+
+
+
+
+
+            //Fix Gross Margin
+
+            // workbook.Worksheets["Tearsheet template"].Cells["B21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["B21"].Value.ToString();
+            // workbook.Worksheets["Tearsheet template"].Cells["C21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["C21"].Value.ToString();
+            // workbook.Worksheets["Tearsheet template"].Cells["D21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["D21"].Value.ToString();
+            // workbook.Worksheets["Tearsheet template"].Cells["E21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["E21"].Value.ToString();
+            // workbook.Worksheets["Tearsheet template"].Cells["F21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["F21"].Value.ToString();
+
+
+
 
             foreach (TearSheetOutput map in tearSheetMapping)
 
             {
 
-		        workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Calculate();
+                workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Calculate();
                 results.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Value));
 
 
-		        
-                      }
+            }
 
             //custom logic for Gross Profit
             object grossProfitResult;
 
-            if(financialYearId == 1) { 
+            if (financialYearId == 1)
+            {
 
-	         workbook.Worksheets["Tearsheet template"].Cells["B21"].Formula = "=B64 * B19";
-            workbook.Worksheets["Tearsheet template"].Cells["B21"].Calculate();
-            grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["B21"].Value;
-	    
-	    }
-            else if(financialYearId == 2) { 
-	          workbook.Worksheets["Tearsheet template"].Cells["C21"].Formula = "=C64 * C19";
-            workbook.Worksheets["Tearsheet template"].Cells["C21"].Calculate();
-            grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["C21"].Value;
-	    
-	    }
+                workbook.Worksheets["Tearsheet template"].Cells["B21"].Formula = "=B64 * B19";
+                workbook.Worksheets["Tearsheet template"].Cells["B21"].Calculate();
+                grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["B21"].Value;
 
-        else if(financialYearId == 3) { 
-	          workbook.Worksheets["Tearsheet template"].Cells["D21"].Formula = "=D64 * D19";
-            workbook.Worksheets["Tearsheet template"].Cells["D21"].Calculate();
-            grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["D21"].Value;
-	    
-	    }
+            }
+            else if (financialYearId == 2)
+            {
+                workbook.Worksheets["Tearsheet template"].Cells["C21"].Formula = "=C64 * C19";
+                workbook.Worksheets["Tearsheet template"].Cells["C21"].Calculate();
+                grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["C21"].Value;
 
- else if(financialYearId == 4) { 
-	          workbook.Worksheets["Tearsheet template"].Cells["E21"].Formula = "=E64 * E19";
-            workbook.Worksheets["Tearsheet template"].Cells["E21"].Calculate();
-            grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["E21"].Value;
-	    
-	    }
+            }
 
-            else { 
+            else if (financialYearId == 3)
+            {
+                workbook.Worksheets["Tearsheet template"].Cells["D21"].Formula = "=D64 * D19";
+                workbook.Worksheets["Tearsheet template"].Cells["D21"].Calculate();
+                grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["D21"].Value;
 
-	        workbook.Worksheets["Tearsheet template"].Cells["F21"].Formula = "=F64 * F19";
-            workbook.Worksheets["Tearsheet template"].Cells["F21"].Calculate();
-            grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["F21"].Value;
-	   
-	    
-	    }
-            KeyValuePair<string, object> grossProfitKeyValuePair = new KeyValuePair<string, object>("Gross Profit",grossProfitResult);
+            }
+
+            else if (financialYearId == 4)
+            {
+                workbook.Worksheets["Tearsheet template"].Cells["E21"].Formula = "=E64 * E19";
+                workbook.Worksheets["Tearsheet template"].Cells["E21"].Calculate();
+                grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["E21"].Value;
+
+            }
+
+            else
+            {
+
+                workbook.Worksheets["Tearsheet template"].Cells["F21"].Formula = "=F64 * F19";
+                workbook.Worksheets["Tearsheet template"].Cells["F21"].Calculate();
+                grossProfitResult = workbook.Worksheets["Tearsheet template"].Cells["F21"].Value;
+
+
+            }
+            KeyValuePair<string, object> grossProfitKeyValuePair = new KeyValuePair<string, object>("Gross Profit", grossProfitResult);
 
 
 
