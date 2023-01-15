@@ -11,9 +11,7 @@ using backend_engine.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Azure.Storage.Blobs;
 using backend_engine.Services;
-using MongoDB.Driver.Core.Configuration;
 using backend_engine.RequestBodies;
-using backend_engine.ResponseBodies;
 using backend_engine.Repositories;
 
 namespace backend_engine.Controllers
@@ -173,13 +171,6 @@ namespace backend_engine.Controllers
         }
 
 
-
-
-
-
-
-
-
         [HttpPost("/StockUpload/Calculate/{id}")]
         public async Task<object> CalculateTearSheet(int id)
         {
@@ -218,7 +209,7 @@ namespace backend_engine.Controllers
                 //List<SummaryTearSheetOutput> summaryTearSheetOutputs = await _context.SummaryTearSheetOutputs.ToListAsync();
                 if (summaryTearSheetOutputs.Count == 0)
                 {
-                    return NotFound();
+                    return NotFound("Stock upload could not be located");
                 }
 
 
@@ -364,51 +355,6 @@ namespace backend_engine.Controllers
                 fifthYearForecastThread.Start();
                 fifthYearForecastThread.Join();
 
-
-                // foreach (TearSheetOutput map in tearsheetMappings_T_1)
-
-                // {
-
-                //     results_T_1.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
-
-                // }
-
-
-                // foreach (TearSheetOutput map in tearsheetMappings_T_2)
-
-                // {
-
-                //     results_T_2.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
-
-                // }
-
-                // foreach (TearSheetOutput map in tearsheetMappings_T_3)
-
-                // {
-
-                //     results_T_3.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
-
-                // }
-
-                // foreach (TearSheetOutput map in tearsheetMappings_T_4)
-
-                // {
-
-                //     results_T_4.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
-
-                // }
-
-
-                // foreach (TearSheetOutput map in tearsheetMappings_T_5)
-
-                // {
-
-                //     results_T_5.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
-
-                // }
-
-
-
                 Dictionary<string, object> result = new Dictionary<string, object>();
 
                 result.Add("Summary", resultsSummaryTearSheetValue);
@@ -480,75 +426,10 @@ namespace backend_engine.Controllers
             List<KeyValuePair<string, object>> resultsSummaryTearSheetValue = new List<KeyValuePair<string, object>>();
 
             List<SummaryTearSheetOutput> summaryTearSheetOutputs = _memoryCache.Get<List<SummaryTearSheetOutput>>("SummarySheetMappings");
-            //List<SummaryTearSheetOutput> summaryTearSheetOutputs = await _context.SummaryTearSheetOutputs.ToListAsync();
-
-            //Drivers stuff 
-
-
-            IEnumerable<DriverTearSheetOutput> firstYearActualLookup = allDriverTearSheets.Where(x => x.FinancialYearId == 1);
-            IEnumerable<DriverTearSheetOutput> secondYearActualLookup = allDriverTearSheets.Where(x => x.FinancialYearId == 2);
-            IEnumerable<DriverTearSheetOutput> thirdYearForecastLookup = allDriverTearSheets.Where(x => x.FinancialYearId == 3);
-            IEnumerable<DriverTearSheetOutput> fourthYearForecastLookup = allDriverTearSheets.Where(x => x.FinancialYearId == 4);
-            IEnumerable<DriverTearSheetOutput> fifthYearForecastLookup = allDriverTearSheets.Where(x => x.FinancialYearId == 5);
-
-            foreach (DriverReference driverInput in request.driverInputs)
-            {
-                if (driverInput.financialYearId == 1)
-                {
-
-                    DriverTearSheetOutput cellLocation = firstYearActualLookup.Where(x => x.Name == driverInput.name).First();
-                    workbook.Worksheets[cellLocation.SheetReference].Cells[cellLocation.CellReference].Formula = driverInput.value.ToString();
 
 
 
-                }
-
-
-
-                else if (driverInput.financialYearId == 2)
-                {
-
-
-                    DriverTearSheetOutput cellLocation = secondYearActualLookup.Where(x => x.Name == driverInput.name).First();
-                    workbook.Worksheets[cellLocation.SheetReference].Cells[cellLocation.CellReference].Formula = driverInput.value.ToString();
-
-
-                }
-
-
-                else if (driverInput.financialYearId == 3)
-                {
-
-                    DriverTearSheetOutput cellLocation = thirdYearForecastLookup.Where(x => x.Name == driverInput.name).First();
-                    workbook.Worksheets[cellLocation.SheetReference].Cells[cellLocation.CellReference].Formula = driverInput.value.ToString();
-
-
-                }
-
-
-                else if (driverInput.financialYearId == 4)
-                {
-
-                    DriverTearSheetOutput cellLocation = fourthYearForecastLookup.Where(x => x.Name == driverInput.name).First();
-                    workbook.Worksheets[cellLocation.SheetReference].Cells[cellLocation.CellReference].Formula = driverInput.value.ToString();
-
-
-                }
-
-                else if (driverInput.financialYearId == 5)
-                {
-
-                    DriverTearSheetOutput cellLocation = fifthYearForecastLookup.Where(x => x.Name == driverInput.name).First();
-                    workbook.Worksheets[cellLocation.SheetReference].Cells[cellLocation.CellReference].Formula = driverInput.value.ToString();
-
-
-                }
-
-
-
-
-            }
-
+            workbook = CalculateDynamicService.UpdateDriverInputs(request.driverInputs, workbook, allDriverTearSheets);
 
 
             List<DriverTearSheetOutput> driverMappingFirstYearActual = stockUpload.DriverTearSheetOutputs.Where(x => x.FinancialYearId == 1).ToList();
@@ -563,121 +444,57 @@ namespace backend_engine.Controllers
             List<KeyValuePair<string, object>> driverResultsFourthYearForecast = new List<KeyValuePair<string, object>>();
             List<KeyValuePair<string, object>> driverResultsFifthYearForecast = new List<KeyValuePair<string, object>>();
 
+            Thread firstYearActualThreadDriver = new Thread(() =>
+            {
+                driverResultsFirstYearActual = CalculateDynamicService.CalculateDynamicDriverTearSheet(driverMappingFirstYearActual, workbook);
 
 
-            foreach (DriverTearSheetOutput map in driverMappingFirstYearActual)
+            });
+
+            Thread secondYearActualThreadDriver = new Thread(() =>
 
             {
-                if (map.IsFormula)
-                {
+                driverResultsSecondYearActual = CalculateDynamicService.CalculateDynamicDriverTearSheet(driverMappingSecondYearActual, workbook);
 
-                    workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Calculate();
-                    driverResultsFirstYearActual.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
-
-                }
-                else
-                {
-
-                    driverResultsFirstYearActual.Add(new KeyValuePair<string, object>(map.Name, 0));
-
-                }
-
-            }
+            });
 
 
-            foreach (DriverTearSheetOutput map in driverMappingSecondYearActual)
+            Thread thirdYearForecastThreadDriver = new Thread(() =>
 
             {
-                if (map.IsFormula)
-                {
+                driverResultsThirdYearForecast = CalculateDynamicService.CalculateDynamicDriverTearSheet(driverMappingThirdYearForecast, workbook);
 
-                    workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Calculate();
-                    driverResultsSecondYearActual.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
-
-                }
-
-                else
-                {
-
-                    driverResultsSecondYearActual.Add(new KeyValuePair<string, object>(map.Name, 0));
-
-                }
+            });
 
 
-            }
+            Thread fourthYearForecastThreadDriver = new Thread(() =>
 
-            foreach (DriverTearSheetOutput map in driverMappingThirdYearForecast)
+                       {
+                           driverResultsFourthYearForecast = CalculateDynamicService.CalculateDynamicDriverTearSheet(driverMappingFourthYearForecast, workbook);
 
-            {
-                if (map.IsFormula)
-                {
+                       });
 
-                    workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Calculate();
-                    driverResultsThirdYearForecast.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
+            Thread fifthYearForecastThreadDriver = new Thread(() =>
 
-                }
+                                  {
+                                      driverResultsFifthYearForecast = CalculateDynamicService.CalculateDynamicDriverTearSheet(driverMappingFifthYearForecast, workbook);
 
-                else
-                {
+                                  });
 
-
-                    driverResultsThirdYearForecast.Add(new KeyValuePair<string, object>(map.Name, 0));
-
-
-
-                }
-
-
-            }
-
-
-            foreach (DriverTearSheetOutput map in driverMappingFourthYearForecast)
-
-            {
-                if (map.IsFormula)
-                {
+            firstYearActualThreadDriver.Start();
+            firstYearActualThreadDriver.Join();
+            secondYearActualThreadDriver.Start();
+            thirdYearForecastThreadDriver.Start();
+            secondYearActualThreadDriver.Join();
+            thirdYearForecastThreadDriver.Join();
+            fourthYearForecastThreadDriver.Start();
+            fourthYearForecastThreadDriver.Join();
+            fifthYearForecastThreadDriver.Start();
+            fifthYearForecastThreadDriver.Join();
 
 
-                    workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Calculate();
-                    driverResultsFourthYearForecast.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
-
-                }
-                else
-                {
-
-
-                    driverResultsFourthYearForecast.Add(new KeyValuePair<string, object>(map.Name, 0));
-
-                }
-
-            }
-
-
-            foreach (DriverTearSheetOutput map in driverMappingFifthYearForecast)
-
-            {
-                if (map.IsFormula)
-                {
-
-                    workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Calculate();
-                    driverResultsFifthYearForecast.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference.ToString()].Cells[map.CellReference.ToString()].Value));
-
-
-                }
-                else
-                {
-
-                    driverResultsFifthYearForecast.Add(new KeyValuePair<string, object>(map.Name, 0));
-
-
-                }
-
-
-            }
 
             List<TearSheetOutput> allTearsheetOutputs = _memoryCache.Get<List<TearSheetOutput>>("TearSheetMappings");
-
-
 
 
             List<TearSheetOutput> tearsheetMappings_T_1 = allTearsheetOutputs.Where(x => x.FinancialYearId == 1).ToList();
@@ -687,6 +504,71 @@ namespace backend_engine.Controllers
             List<TearSheetOutput> tearsheetMappings_T_5 = allTearsheetOutputs.Where(x => x.FinancialYearId == 5).ToList();
 
 
+            // workbook = CalculateDynamicService.UpdateTearSheetInputs(request.cellInputs, workbook, tearsheetMappings_T_1);
+            // workbook = CalculateDynamicService.UpdateTearSheetInputs(request.cellInputs, workbook, tearsheetMappings_T_2);
+            // workbook = CalculateDynamicService.UpdateTearSheetInputs(request.cellInputs, workbook, tearsheetMappings_T_3);
+            // workbook = CalculateDynamicService.UpdateTearSheetInputs(request.cellInputs, workbook, tearsheetMappings_T_4);
+            // workbook = CalculateDynamicService.UpdateTearSheetInputs(request.cellInputs, workbook, tearsheetMappings_T_5);
+
+
+            foreach (TearSheetReference cellInput in request.cellInputs)
+            {
+
+                if (cellInput.financialYearId == 1)
+                {
+
+
+                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_1.Where(x => x.Name == cellInput.name).First();
+                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = cellInput.value.ToString();
+
+
+                }
+
+                if (cellInput.financialYearId == 2)
+                {
+
+
+                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_2.Where(x => x.Name == cellInput.name).First();
+                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = cellInput.value.ToString();
+
+
+                }
+
+                if (cellInput.financialYearId == 3)
+                {
+
+
+                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_3.Where(x => x.Name == cellInput.name).First();
+                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = cellInput.value.ToString();
+
+
+                }
+
+
+
+                if (cellInput.financialYearId == 4)
+                {
+
+
+                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_4.Where(x => x.Name == cellInput.name).First();
+                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = cellInput.value.ToString();
+
+
+                }
+
+                if (cellInput.financialYearId == 5)
+
+                {
+
+                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_5.Where(x => x.Name == cellInput.name).First();
+                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = cellInput.value.ToString();
+
+                }
+
+
+            }
+
+
 
             List<KeyValuePair<string, object>> results_T_1 = new List<KeyValuePair<string, object>>();
             List<KeyValuePair<string, object>> results_T_2 = new List<KeyValuePair<string, object>>();
@@ -694,64 +576,11 @@ namespace backend_engine.Controllers
             List<KeyValuePair<string, object>> results_T_4 = new List<KeyValuePair<string, object>>();
             List<KeyValuePair<string, object>> results_T_5 = new List<KeyValuePair<string, object>>();
 
-            foreach (TearSheetReference inputCell in request.cellInputs)
-
-            {
-                if (inputCell.financialYearId == 1)
-                {
-                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_1.Where(x => x.Name == inputCell.name).First();
-                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = inputCell.value.ToString();
-
-
-
-                }
-                else if (inputCell.financialYearId == 2)
-                {
-
-                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_2.Where(x => x.Name == inputCell.name).First();
-                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = inputCell.value.ToString();
-
-
-
-                }
-
-                else if (inputCell.financialYearId == 3)
-                {
-
-                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_3.Where(x => x.Name == inputCell.name).First();
-                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = inputCell.value.ToString();
-
-
-
-                }
-
-                else if (inputCell.financialYearId == 4)
-                {
-
-                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_4.Where(x => x.Name == inputCell.name).First();
-                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = inputCell.value.ToString();
-
-
-
-                }
-
-                else if (inputCell.financialYearId == 5)
-                {
-
-                    TearSheetOutput CellLocationOfItem = tearsheetMappings_T_5.Where(x => x.Name == inputCell.name).First();
-                    workbook.Worksheets[CellLocationOfItem.SheetReference].Cells[CellLocationOfItem.CellReference].Formula = inputCell.value.ToString();
-
-                }
-
-
-
-            }
-
-            Thread firstYearActualThread = new Thread(() => { results_T_1 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_1, workbook); });
-            Thread secondYearActualThread = new Thread(() => { results_T_2 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_2, workbook); });
-            Thread thirdYearForecastThread = new Thread(() => { results_T_3 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_3, workbook); });
-            Thread fourthYearForecastThread = new Thread(() => { results_T_4 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_4, workbook); });
-            Thread fifthYearForecastThread = new Thread(() => { results_T_5 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_5, workbook); });
+            Thread firstYearActualThread = new Thread(() => { results_T_1 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_1, workbook,1); });
+            Thread secondYearActualThread = new Thread(() => { results_T_2 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_2, workbook,2); });
+            Thread thirdYearForecastThread = new Thread(() => { results_T_3 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_3, workbook,3); });
+            Thread fourthYearForecastThread = new Thread(() => { results_T_4 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_4, workbook,4); });
+            Thread fifthYearForecastThread = new Thread(() => { results_T_5 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_5, workbook,5); });
 
             firstYearActualThread.Start();
             firstYearActualThread.Join();
@@ -780,7 +609,6 @@ namespace backend_engine.Controllers
 
 
             return result;
-
 
 
 

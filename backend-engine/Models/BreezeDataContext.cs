@@ -33,6 +33,8 @@ public partial class BreezeDataContext : DbContext
 
     public DbSet<DriverTearSheetOutput> DriverTearSheetOutputs { get; set; }
 
+    public DbSet<StockUploadComment>  StockUploadComments { get; set; }
+
 
 
 }

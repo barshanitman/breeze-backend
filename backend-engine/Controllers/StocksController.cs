@@ -7,17 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend_engine.Models;
 using backend_engine.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend_engine.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class StocksController : ControllerBase
     {
         private readonly BreezeDataContext _context;
         private readonly IRepository<Stock> _repo;
 
-        public StocksController(BreezeDataContext context,IRepository<Stock> repo)
+        public StocksController(BreezeDataContext context, IRepository<Stock> repo)
         {
             _context = context;
             _repo = repo;
@@ -27,10 +29,10 @@ namespace backend_engine.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Stock>>> GetStocks()
         {
-          if (_context.Stocks == null)
-          {
-              return NotFound();
-          }
+            if (_context.Stocks == null)
+            {
+                return NotFound();
+            }
             return Ok(await _repo.GetAll());
         }
 
@@ -38,12 +40,12 @@ namespace backend_engine.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<object>> GetStock(int id)
         {
-          if (_context.Stocks == null)
-          {
-              return NotFound();
-          }
+            if (_context.Stocks == null)
+            {
+                return NotFound();
+            }
             //Stock stock = await _repo.GetById(id);
-            object stock =  _context.Stocks.Where(x => x.Id == id).Include(x => x.StockUploads.OrderByDescending(t => t.UploadedAt)).ThenInclude(c => c.StockTearSheetOutputs);
+            object stock = _context.Stocks.Where(x => x.Id == id).Include(x => x.StockUploads.OrderByDescending(t => t.UploadedAt)).ThenInclude(c => c.StockTearSheetOutputs);
 
             if (stock == null)
             {
@@ -90,12 +92,12 @@ namespace backend_engine.Controllers
         [HttpPost]
         public async Task<ActionResult<Stock>> PostStock(Stock stock)
         {
-          if (_context.Stocks == null)
-          {
-              return Problem("Entity set 'BreezeDataContext.Stocks'  is null.");
-          }
-	        Stock new_stock = _repo.Add(stock);
-	        await _repo.SaveChanges();
+            if (_context.Stocks == null)
+            {
+                return Problem("Entity set 'BreezeDataContext.Stocks'  is null.");
+            }
+            Stock new_stock = _repo.Add(stock);
+            await _repo.SaveChanges();
             return CreatedAtAction("GetStock", new { id = stock.Id }, stock);
         }
 
@@ -103,7 +105,7 @@ namespace backend_engine.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStock(int id)
         {
-           
+
             Stock stock = await _repo.GetById(id);
             if (stock == null)
             {
@@ -121,13 +123,13 @@ namespace backend_engine.Controllers
             return (_context.Stocks?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
-     //   [HttpPost("/tearsheet/{id}")]
-     //   public async Task<object> GetTearSheetByStock(int id)
+        //   [HttpPost("/tearsheet/{id}")]
+        //   public async Task<object> GetTearSheetByStock(int id)
 
-     //   { 
+        //   { 
 
-	
-	
-    	//}
+
+
+        //}
     }
 }

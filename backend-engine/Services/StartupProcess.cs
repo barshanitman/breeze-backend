@@ -56,6 +56,7 @@ namespace backend_engine.Services
                     blobClient.DownloadTo(stream);
                     ExcelFile workbook = ExcelFile.Load(stream);
                     workbook = PreprocessWorkbook.PreProcessFile(workbook);
+                    workbook.CalculationOptions.EnableIterativeCalculation = true;
                     _cache.Set(blob.Name, workbook);
                     stream.Close();
                     Console.WriteLine($"Finished loading workook:{blob.Name}");

@@ -19,4 +19,6 @@ public partial class StockUpload:IBaseEntity
     public List<StockTearSheetOutput> StockTearSheetOutputs { get; set; } = new List<StockTearSheetOutput>();
 
     public List<DriverTearSheetOutput> DriverTearSheetOutputs { get; set; } = new List<DriverTearSheetOutput>();
+
+    public List<StockUploadComment>  StockUploadComments{ get; set; } = new List<StockUploadComment>();
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend_engine.Models;
 
@@ -11,9 +12,11 @@ using backend_engine.Models;
 namespace backendengine.Migrations
 {
     [DbContext(typeof(BreezeDataContext))]
-    partial class BreezeDataContextModelSnapshot : ModelSnapshot
+    [Migration("20230111041615_StockUploadCommentsEntity")]
+    partial class StockUploadCommentsEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,10 +213,6 @@ namespace backendengine.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("imageURL")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
