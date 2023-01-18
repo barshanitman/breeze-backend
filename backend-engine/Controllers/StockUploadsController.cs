@@ -510,6 +510,16 @@ namespace backend_engine.Controllers
             // workbook = CalculateDynamicService.UpdateTearSheetInputs(request.cellInputs, workbook, tearsheetMappings_T_4);
             // workbook = CalculateDynamicService.UpdateTearSheetInputs(request.cellInputs, workbook, tearsheetMappings_T_5);
 
+            List<TearSheetReference> GrossMarginEntries = request.cellInputs.Where(x => x.name == "Gross Margin").ToList();
+            bool isGrossMarginAnInput = true;
+
+            if (GrossMarginEntries.Count == 0)
+            {
+                isGrossMarginAnInput = false;
+
+            }
+
+
 
             foreach (TearSheetReference cellInput in request.cellInputs)
             {
@@ -576,11 +586,11 @@ namespace backend_engine.Controllers
             List<KeyValuePair<string, object>> results_T_4 = new List<KeyValuePair<string, object>>();
             List<KeyValuePair<string, object>> results_T_5 = new List<KeyValuePair<string, object>>();
 
-            Thread firstYearActualThread = new Thread(() => { results_T_1 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_1, workbook,1); });
-            Thread secondYearActualThread = new Thread(() => { results_T_2 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_2, workbook,2); });
-            Thread thirdYearForecastThread = new Thread(() => { results_T_3 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_3, workbook,3); });
-            Thread fourthYearForecastThread = new Thread(() => { results_T_4 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_4, workbook,4); });
-            Thread fifthYearForecastThread = new Thread(() => { results_T_5 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_5, workbook,5); });
+            Thread firstYearActualThread = new Thread(() => { results_T_1 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_1, workbook, 1, isGrossMarginAnInput); });
+            Thread secondYearActualThread = new Thread(() => { results_T_2 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_2, workbook, 2, isGrossMarginAnInput); });
+            Thread thirdYearForecastThread = new Thread(() => { results_T_3 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_3, workbook, 3, isGrossMarginAnInput); });
+            Thread fourthYearForecastThread = new Thread(() => { results_T_4 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_4, workbook, 4, isGrossMarginAnInput); });
+            Thread fifthYearForecastThread = new Thread(() => { results_T_5 = CalculateDynamicService.CalculateFinancialYearTearSheet(tearsheetMappings_T_5, workbook, 5, isGrossMarginAnInput); });
 
             firstYearActualThread.Start();
             firstYearActualThread.Join();

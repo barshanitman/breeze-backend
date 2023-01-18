@@ -16,36 +16,59 @@ namespace backend_engine.Services
 
         }
 
-        public static List<KeyValuePair<string, object>> CalculateFinancialYearTearSheet(List<TearSheetOutput> tearSheetMapping, ExcelFile workbook, int financialYearId)
+        public static List<KeyValuePair<string, object>> CalculateFinancialYearTearSheet(List<TearSheetOutput> tearSheetMapping, ExcelFile workbook, int financialYearId,bool grossMarginIsInput)
         {
 
             List<KeyValuePair<string, object>> results = new List<KeyValuePair<string, object>>();
 
+            if(grossMarginIsInput) {
 
 
+            workbook.Worksheets["Tearsheet template"].Cells["B64"].Calculate();
+            workbook.Worksheets["Tearsheet template"].Cells["C64"].Calculate();
+            workbook.Worksheets["Tearsheet template"].Cells["D64"].Calculate();
+            workbook.Worksheets["Tearsheet template"].Cells["E64"].Calculate();
+            workbook.Worksheets["Tearsheet template"].Cells["F64"].Calculate();
 
 
-
-            //Fix Gross Margin
-
-            // workbook.Worksheets["Tearsheet template"].Cells["B21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["B21"].Value.ToString();
-            // workbook.Worksheets["Tearsheet template"].Cells["C21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["C21"].Value.ToString();
-            // workbook.Worksheets["Tearsheet template"].Cells["D21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["D21"].Value.ToString();
-            // workbook.Worksheets["Tearsheet template"].Cells["E21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["E21"].Value.ToString();
-            // workbook.Worksheets["Tearsheet template"].Cells["F21"].Formula = workbook.Worksheets["Tearsheet template"].Cells["F21"].Value.ToString();
+            } else {
 
 
+            workbook.Worksheets["Tearsheet template"].Cells["B64"].Formula = workbook.Worksheets["Tearsheet template"].Cells["B64"].Value.ToString();
+            workbook.Worksheets["Tearsheet template"].Cells["B64"].Calculate();
+
+            workbook.Worksheets["Tearsheet template"].Cells["C64"].Formula = workbook.Worksheets["Tearsheet template"].Cells["C64"].Value.ToString();
+            workbook.Worksheets["Tearsheet template"].Cells["C64"].Calculate();
+
+            workbook.Worksheets["Tearsheet template"].Cells["D64"].Formula = workbook.Worksheets["Tearsheet template"].Cells["D64"].Value.ToString();
+            workbook.Worksheets["Tearsheet template"].Cells["D64"].Calculate();
+
+            workbook.Worksheets["Tearsheet template"].Cells["E64"].Formula = workbook.Worksheets["Tearsheet template"].Cells["E64"].Value.ToString();
+            workbook.Worksheets["Tearsheet template"].Cells["E64"].Calculate();
+
+            workbook.Worksheets["Tearsheet template"].Cells["F64"].Formula = workbook.Worksheets["Tearsheet template"].Cells["F64"].Value.ToString();
+            workbook.Worksheets["Tearsheet template"].Cells["F64"].Calculate();
 
 
-            foreach (TearSheetOutput map in tearSheetMapping)
-
-            {
-
-                workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Calculate();
-                results.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Value));
 
 
             }
+
+
+
+
+            
+
+
+            // foreach (TearSheetOutput map in tearSheetMapping)
+
+            // {
+
+            //     workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Calculate();
+            //     // results.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Value));
+
+
+            // }
 
             //custom logic for Gross Profit
             object grossProfitResult;
@@ -91,18 +114,40 @@ namespace backend_engine.Services
 
 
             }
-            KeyValuePair<string, object> grossProfitKeyValuePair = new KeyValuePair<string, object>("Gross Profit", grossProfitResult);
+            foreach (TearSheetOutput map in tearSheetMapping)
+
+            {
+
+                workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Calculate();
+
+                if (workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Value == null)
+                {
 
 
+                    results.Add(new KeyValuePair<string, object>(map.Name, 0));
+
+                }
+                else
+                {
+
+                    results.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Value));
+
+                }
 
 
-            results[results.FindIndex(x => x.Key == "Gross Profit")] = grossProfitKeyValuePair;
-
-
-
-
-
+            }
             return results;
+
+
+
+
+
+
+            // results[results.FindIndex(x => x.Key == "Gross Profit")] = grossProfitKeyValuePair;
+
+
+
+
 
 
         }
@@ -116,7 +161,21 @@ namespace backend_engine.Services
             foreach (TearSheetOutput map in tearsheetMappings)
             {
 
-                results.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Value));
+                if (workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Value == null)
+                {
+
+                    results.Add(new KeyValuePair<string, object>(map.Name, 0));
+
+                }
+                else
+                {
+
+                    results.Add(new KeyValuePair<string, object>(map.Name, workbook.Worksheets[map.SheetReference].Cells[map.CellReference].Value));
+
+
+                }
+
+
 
 
             }
