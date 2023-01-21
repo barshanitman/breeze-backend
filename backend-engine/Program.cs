@@ -40,7 +40,12 @@ builder.Services.AddAzureClients(builder =>
 
 builder.Services.AddTransient<IStorageService, StorageService>();
 builder.Services.AddTransient<IAddDriverStockUploadService, AddDriverStockUploadService>();
+
+//Repository Dependency Injections
+
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
 
 builder.Services.AddHostedService<StartupProcess>();
 

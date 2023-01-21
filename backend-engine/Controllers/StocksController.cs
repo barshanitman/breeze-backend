@@ -16,12 +16,10 @@ namespace backend_engine.Controllers
 
     public class StocksController : ControllerBase
     {
-        private readonly BreezeDataContext _context;
-        private readonly IRepository<Stock> _repo;
+        private readonly IStockRepository _repo;
 
-        public StocksController(BreezeDataContext context, IRepository<Stock> repo)
+        public StocksController(IStockRepository repo)
         {
-            _context = context;
             _repo = repo;
         }
 
@@ -29,10 +27,6 @@ namespace backend_engine.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Stock>>> GetStocks()
         {
-            if (_context.Stocks == null)
-            {
-                return NotFound();
-            }
             return Ok(await _repo.GetAll());
         }
 
@@ -40,12 +34,10 @@ namespace backend_engine.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<object>> GetStock(int id)
         {
-            if (_context.Stocks == null)
-            {
-                return NotFound();
-            }
+
             //Stock stock = await _repo.GetById(id);
-            object stock = _context.Stocks.Where(x => x.Id == id).Include(x => x.StockUploads.OrderByDescending(t => t.UploadedAt)).ThenInclude(c => c.StockTearSheetOutputs);
+            // object stock = _context.Stocks.Where(x => x.Id == id).Include(x => x.StockUploads.OrderByDescending(t => t.UploadedAt)).ThenInclude(c => c.StockTearSheetOutputs);
+            object stock = await _repo.GetStockWithStockUploads(id);
 
             if (stock == null)
             {
@@ -66,15 +58,18 @@ namespace backend_engine.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(stock).State = EntityState.Modified;
+            // _context.Entry(stock).State = EntityState.Modified;
+            _repo.UpdateEntity(stock);
+
+
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _repo.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!StockExists(id))
+                if (!_repo.EntityExists(id))
                 {
                     return NotFound();
                 }
@@ -92,10 +87,10 @@ namespace backend_engine.Controllers
         [HttpPost]
         public async Task<ActionResult<Stock>> PostStock(Stock stock)
         {
-            if (_context.Stocks == null)
-            {
-                return Problem("Entity set 'BreezeDataContext.Stocks'  is null.");
-            }
+            // if (_context.Stocks == null)
+            // {
+            //     return Problem("Entity set 'BreezeDataContext.Stocks'  is null.");
+            // }
             Stock new_stock = _repo.Add(stock);
             await _repo.SaveChanges();
             return CreatedAtAction("GetStock", new { id = stock.Id }, stock);
@@ -118,10 +113,10 @@ namespace backend_engine.Controllers
             return NoContent();
         }
 
-        private bool StockExists(int id)
-        {
-            return (_context.Stocks?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        // private bool StockExists(int id)
+        // {
+        //     return (_context.Stocks?.Any(e => e.Id == id)).GetValueOrDefault();
+        // }
 
         //   [HttpPost("/tearsheet/{id}")]
         //   public async Task<object> GetTearSheetByStock(int id)

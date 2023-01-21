@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend_engine.Repositories
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class,IBaseEntity
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, IBaseEntity
     {
-        private readonly BreezeDataContext _context;
+        public readonly BreezeDataContext _context;
 
-        private readonly DbSet<TEntity> _entities;
+        public readonly DbSet<TEntity> _entities;
 
         public Repository(BreezeDataContext context)
         {
@@ -23,35 +23,53 @@ namespace backend_engine.Repositories
             return entity;
         }
 
-        public async Task<TEntity> FindByCondition(Expression<Func<TEntity, bool>> predicate)
+        public virtual async Task<TEntity> FindByCondition(Expression<Func<TEntity, bool>> predicate)
         {
             return await _context.Set<TEntity>().FirstOrDefaultAsync(predicate);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAll()
+        public virtual async Task<IEnumerable<TEntity>> GetAll()
         {
             return await _entities.ToListAsync();
         }
 
-        public async Task<TEntity> GetById(int Id)
+        public virtual async Task<TEntity> GetById(int Id)
         {
             return await _entities.SingleOrDefaultAsync(q => q.Id == Id);
         }
 
-        public async Task<bool> SaveChanges()
+        public virtual async Task<bool> SaveChanges()
         {
             return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
         }
 
-	public async Task<bool> RemoveEntity(int Id)
-	 {
-	    TEntity entity = await  _entities.SingleOrDefaultAsync(q => q.Id == Id);
-	   _context.Remove(entity);
-	   
-        return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
-	
-	
-	    }
+        public virtual async Task<bool> RemoveEntity(int Id)
+        {
+            TEntity entity = await _entities.SingleOrDefaultAsync(q => q.Id == Id);
+            _context.Remove(entity);
+
+            return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
+
+
+        }
+
+        public void UpdateEntity(TEntity entity)
+        {
+
+            _context.Entry(entity).State = EntityState.Modified;
+
+        }
+
+        TEntity IRepository<TEntity>.UpdateEntity(TEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool EntityExists(int Id)
+        {
+
+            return (_entities?.Any(e => e.Id == Id)).GetValueOrDefault();
+        }
     }
 }
 
