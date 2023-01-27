@@ -29,11 +29,12 @@ public partial class BreezeDataContext : DbContext
 
     public DbSet<SummaryTearSheetOutput> SummaryTearSheetOutputs { get; set; }
 
-    public DbSet<StockUploadTearsheetValue> StockUploadTearsheetValues {get;set;}
+    public DbSet<StockUploadTearsheetValue> StockUploadTearsheetValues { get; set; }
 
     public DbSet<DriverTearSheetOutput> DriverTearSheetOutputs { get; set; }
 
-    public DbSet<StockUploadComment>  StockUploadComments { get; set; }
+    public DbSet<StockUploadComment> StockUploadComments { get; set; }
+    public DbSet<StockUploadValuation> StockUploadValuations { get; set; }
 
 
 

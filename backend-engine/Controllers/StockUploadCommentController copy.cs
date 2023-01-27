@@ -11,73 +11,73 @@ namespace backend_engine.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StockUploadCommentController : ControllerBase
+    public class StockUploadValuationController : ControllerBase
     {
         private readonly BreezeDataContext _context;
 
-        public StockUploadCommentController(BreezeDataContext context)
+        public StockUploadValuationController(BreezeDataContext context)
         {
             _context = context;
         }
 
         // GET: api/StockUploadComment
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StockUploadComment>>> GetStockUploadComments()
+        public async Task<ActionResult<IEnumerable<StockUploadValuation>>> GetStockUploadComments()
         {
             if (_context.StockUploadComments == null)
             {
                 return NotFound();
             }
-            return await _context.StockUploadComments.ToListAsync();
+            return await _context.StockUploadValuations.ToListAsync();
         }
 
         // GET: api/StockUploadComment/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<StockUploadComment>> GetStockUploadComment(int id)
+        public async Task<ActionResult<StockUploadValuation>> GetStockUploadComment(int id)
         {
-            if (_context.StockUploadComments == null)
+            if (_context.StockUploadValuations == null)
             {
                 return NotFound();
             }
-            var stockUploadComment = await _context.StockUploadComments.FindAsync(id);
+            var stockUploadValuation = await _context.StockUploadValuations.FindAsync(id);
 
-            if (stockUploadComment == null)
+            if (stockUploadValuation == null)
             {
                 return NotFound();
             }
 
-            return stockUploadComment;
+            return stockUploadValuation;
         }
 
-        [HttpGet("/api/StockUploadComment/StockUpload/{id}")]
-        public async Task<ActionResult<StockUploadComment>> GetStockUploadCommentByStockUploadId(int id)
+        [HttpGet("/api/StockUploadValuation/StockUpload/{id}")]
+        public async Task<ActionResult<StockUploadValuation>> GetStockUploadCommentByStockUploadId(int id)
         {
-            if (_context.StockUploadComments == null)
+            if (_context.StockUploadValuations == null)
             {
                 return NotFound();
             }
-            var stockUploadComment = await _context.StockUploadComments.OrderByDescending(x => x.UploadedAt).Where(x => x.StockUploadId == id).ToListAsync();
+            var stockUploadValuations = await _context.StockUploadComments.OrderByDescending(x => x.UploadedAt).Where(x => x.StockUploadId == id).ToListAsync();
 
-            if (stockUploadComment == null)
+            if (stockUploadValuations == null)
             {
                 return NotFound();
             }
 
-            return Ok(stockUploadComment);
+            return Ok(stockUploadValuations);
         }
 
 
         // PUT: api/StockUploadComment/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStockUploadComment(int id, StockUploadComment stockUploadComment)
+        public async Task<IActionResult> PutStockUploadComment(int id, StockUploadValuation stockUploadValuation)
         {
-            if (id != stockUploadComment.Id)
+            if (id != stockUploadValuation.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(stockUploadComment).State = EntityState.Modified;
+            _context.Entry(stockUploadValuation).State = EntityState.Modified;
 
             try
             {
@@ -85,7 +85,7 @@ namespace backend_engine.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!StockUploadCommentExists(id))
+                if (!StockUploadValuationExists(id))
                 {
                     return NotFound();
                 }
@@ -101,41 +101,41 @@ namespace backend_engine.Controllers
         // POST: api/StockUploadComment
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<StockUploadComment>> PostStockUploadComment(StockUploadComment stockUploadComment)
+        public async Task<ActionResult<StockUploadValuation>> PostStockUploadComment(StockUploadValuation stockUploadValuations)
         {
-            if (_context.StockUploadComments == null)
+            if (_context.StockUploadValuations == null)
             {
                 return Problem("Entity set 'BreezeDataContext.StockUploadComments'  is null.");
             }
-            _context.StockUploadComments.Add(stockUploadComment);
+            _context.StockUploadValuations.Add(stockUploadValuations);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStockUploadComment", new { id = stockUploadComment.Id }, stockUploadComment);
+            return CreatedAtAction("GetStockUploadComment", new { id = stockUploadValuations.Id }, stockUploadValuations);
         }
 
         // DELETE: api/StockUploadComment/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStockUploadComment(int id)
         {
-            if (_context.StockUploadComments == null)
+            if (_context.StockUploadValuations == null)
             {
                 return NotFound();
             }
-            var stockUploadComment = await _context.StockUploadComments.FindAsync(id);
-            if (stockUploadComment == null)
+            var stockUploadValuations = await _context.StockUploadValuations.FindAsync(id);
+            if (stockUploadValuations == null)
             {
                 return NotFound();
             }
 
-            _context.StockUploadComments.Remove(stockUploadComment);
+            _context.StockUploadValuations.Remove(stockUploadValuations);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool StockUploadCommentExists(int id)
+        private bool StockUploadValuationExists(int id)
         {
-            return (_context.StockUploadComments?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.StockUploadValuations?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
