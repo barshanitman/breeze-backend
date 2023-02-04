@@ -22,7 +22,7 @@ namespace backend_engine.Controllers
 
         // GET: api/StockUploadComment
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StockUploadValuation>>> GetStockUploadComments()
+        public async Task<ActionResult<IEnumerable<StockUploadValuation>>> GetStockUploadValuations()
         {
             if (_context.StockUploadComments == null)
             {
@@ -33,7 +33,7 @@ namespace backend_engine.Controllers
 
         // GET: api/StockUploadComment/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<StockUploadValuation>> GetStockUploadComment(int id)
+        public async Task<ActionResult<StockUploadValuation>> GetStockUploadValuation(int id)
         {
             if (_context.StockUploadValuations == null)
             {
@@ -50,13 +50,13 @@ namespace backend_engine.Controllers
         }
 
         [HttpGet("/api/StockUploadValuation/StockUpload/{id}")]
-        public async Task<ActionResult<StockUploadValuation>> GetStockUploadCommentByStockUploadId(int id)
+        public async Task<ActionResult<StockUploadValuation>> GetStockUploadValuationByStockUploadId(int id)
         {
             if (_context.StockUploadValuations == null)
             {
                 return NotFound();
             }
-            var stockUploadValuations = await _context.StockUploadComments.OrderByDescending(x => x.UploadedAt).Where(x => x.StockUploadId == id).ToListAsync();
+            var stockUploadValuations = await _context.StockUploadValuations.Where(x => x.StockUploadId == id).ToListAsync();
 
             if (stockUploadValuations == null)
             {
@@ -70,7 +70,7 @@ namespace backend_engine.Controllers
         // PUT: api/StockUploadComment/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutStockUploadComment(int id, StockUploadValuation stockUploadValuation)
+        public async Task<IActionResult> PutStockUploadValuation(int id, StockUploadValuation stockUploadValuation)
         {
             if (id != stockUploadValuation.Id)
             {
@@ -101,7 +101,7 @@ namespace backend_engine.Controllers
         // POST: api/StockUploadComment
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<StockUploadValuation>> PostStockUploadComment(StockUploadValuation stockUploadValuations)
+        public async Task<ActionResult<StockUploadValuation>> PostStockUploadValuation(StockUploadValuation stockUploadValuations)
         {
             if (_context.StockUploadValuations == null)
             {
@@ -110,7 +110,7 @@ namespace backend_engine.Controllers
             _context.StockUploadValuations.Add(stockUploadValuations);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStockUploadComment", new { id = stockUploadValuations.Id }, stockUploadValuations);
+            return CreatedAtAction("PostStockUploadValuation", new { id = stockUploadValuations.Id }, stockUploadValuations);
         }
 
         // DELETE: api/StockUploadComment/5

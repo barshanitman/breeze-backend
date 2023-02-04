@@ -14,6 +14,8 @@ namespace backend_engine.Repositories
 
         }
 
+
+
         public async Task<object> GetStockWithStockUploads(int Id)
         {
 
@@ -23,12 +25,14 @@ namespace backend_engine.Repositories
 
         }
 
+        public async Task<object> GetAllStocksWithStockUploads()
+        {
+            object stock = await _context.Stocks.Include(x => x.StockUploads.OrderByDescending(t => t.UploadedAt)).ThenInclude(c => c.StockTearSheetOutputs).ToListAsync();
+            return stock;
 
 
+        }
     }
-
-
-
 
 
 

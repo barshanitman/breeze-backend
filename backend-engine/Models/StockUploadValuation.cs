@@ -10,7 +10,6 @@ public partial class StockUploadValuation : IBaseEntity
     public string? Methodologies { get; set; }
 
 
-
     [ForeignKey(nameof(StockUploadId))]
     public int StockUploadId { get; set; }
 

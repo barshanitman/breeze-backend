@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend_engine.Models;
 
@@ -11,9 +12,11 @@ using backend_engine.Models;
 namespace backendengine.Migrations
 {
     [DbContext(typeof(BreezeDataContext))]
-    partial class BreezeDataContextModelSnapshot : ModelSnapshot
+    [Migration("20230128010513_madenullabele")]
+    partial class madenullabele
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -262,7 +265,8 @@ namespace backendengine.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StockUploadId");
+                    b.HasIndex("StockUploadId")
+                        .IsUnique();
 
                     b.ToTable("StockUploadValuations");
                 });
@@ -382,8 +386,8 @@ namespace backendengine.Migrations
             modelBuilder.Entity("backend_engine.Models.StockUploadValuation", b =>
                 {
                     b.HasOne("backend_engine.Models.StockUpload", null)
-                        .WithMany("StockUploadValuation")
-                        .HasForeignKey("StockUploadId")
+                        .WithOne("StockUploadValuation")
+                        .HasForeignKey("backend_engine.Models.StockUploadValuation", "StockUploadId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -419,7 +423,8 @@ namespace backendengine.Migrations
 
                     b.Navigation("StockUploadComments");
 
-                    b.Navigation("StockUploadValuation");
+                    b.Navigation("StockUploadValuation")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("backend_engine.Models.TearSheetOutput", b =>

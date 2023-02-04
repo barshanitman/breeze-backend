@@ -1,5 +1,5 @@
 using System;
-using System.Threading;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -213,7 +213,7 @@ namespace backend_engine.Controllers
                     return NotFound("Stock upload could not be located");
                 }
 
-                object result = CalculateDynamicService.CalculateTearSheet(workbook, summaryTearSheetOutputs, stockUpload, allTearsheetOutputs);
+                Dictionary<string, object> result = await CalculateDynamicService.CalculateTearSheet(workbook, summaryTearSheetOutputs, stockUpload, allTearsheetOutputs);
 
 
 
@@ -225,6 +225,7 @@ namespace backend_engine.Controllers
             else
 
             {
+
                 return calcResult;
             }
 
@@ -277,9 +278,7 @@ namespace backend_engine.Controllers
 
 
 
-
-
-            object result = CalculateDynamicService.CalculateDynamicInputValues(workbook, request, stockUpload, allDriverTearSheets, summaryTearSheetOutputs, allTearsheetOutputs);
+            Dictionary<string, object> result = await CalculateDynamicService.CalculateDynamicInputValues(workbook, request, stockUpload, allDriverTearSheets, summaryTearSheetOutputs, allTearsheetOutputs);
 
             return result;
 

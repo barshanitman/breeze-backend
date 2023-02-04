@@ -7,6 +7,7 @@ namespace backend_engine.Repositories
     {
 
         public Task<object> GetStockWithStockUploads(int Id);
+        public Task<object> GetAllStocksWithStockUploads();
 
 
     }

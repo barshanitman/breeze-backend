@@ -18,14 +18,14 @@ using backend_engine.Repositories;
 
 namespace backend_engine.Services
 {
-    public class CalculateDynamicService
+    public static class CalculateDynamicService
     {
 
-        public CalculateDynamicService()
-        {
+        // public CalculateDynamicService()
+        // {
 
 
-        }
+        // }
 
         public static List<KeyValuePair<string, object>> CalculateFinancialYearTearSheet(List<TearSheetOutput> tearSheetMapping, ExcelFile workbook, int financialYearId, bool grossMarginIsInput)
         {
@@ -345,7 +345,7 @@ namespace backend_engine.Services
 
         }
 
-        public static async Task<object> CalculateTearSheet(ExcelFile workbook, List<SummaryTearSheetOutput> summaryTearSheetOutputs, StockUpload stockUpload, List<TearSheetOutput> allTearsheetOutputs)
+        public static async Task<Dictionary<string, object>> CalculateTearSheet(ExcelFile workbook, List<SummaryTearSheetOutput> summaryTearSheetOutputs, StockUpload stockUpload, List<TearSheetOutput> allTearsheetOutputs)
         {
 
             List<KeyValuePair<string, object>> resultsSummaryTearSheetValue = new List<KeyValuePair<string, object>>();
@@ -511,7 +511,7 @@ namespace backend_engine.Services
 
 
         }
-        public static async Task<object> CalculateDynamicInputValues(ExcelFile workbook, DynamicInputsBody request, StockUpload stockUpload, IEnumerable<DriverTearSheetOutput> allDriverTearSheets, List<SummaryTearSheetOutput> summaryTearSheetOutputs, List<TearSheetOutput> allTearsheetOutputs)
+        public static async Task<Dictionary<string, object>> CalculateDynamicInputValues(ExcelFile workbook, DynamicInputsBody request, StockUpload stockUpload, IEnumerable<DriverTearSheetOutput> allDriverTearSheets, List<SummaryTearSheetOutput> summaryTearSheetOutputs, List<TearSheetOutput> allTearsheetOutputs)
         {
 
             SpreadsheetInfo.SetLicense("SN-2022Dec14-8dsaQkUuOJsK9mB7z329lSTP9Re69lgZv8e3hfz7b8MeGQ89HmAgjhHwkBr7fW0CagUGOTdUhyb5AAd/RQTCPShAtug==A");

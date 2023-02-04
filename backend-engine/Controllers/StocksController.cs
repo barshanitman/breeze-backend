@@ -27,7 +27,7 @@ namespace backend_engine.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Stock>>> GetStocks()
         {
-            return Ok(await _repo.GetAll());
+            return Ok(await _repo.GetAllStocksWithStockUploads());
         }
 
         // GET: api/Stocks/5

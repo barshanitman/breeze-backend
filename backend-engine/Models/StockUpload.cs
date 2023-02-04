@@ -15,7 +15,7 @@ public partial class StockUpload : IBaseEntity
     public int StockId { get; set; }
 
     public List<ProfitLossDriver> ProfitLossDrivers { get; set; } = new List<ProfitLossDriver>();
-    public StockUploadValuation StockUploadValuation { get; set; } = new StockUploadValuation();
+    public List<StockUploadValuation> StockUploadValuation { get; set; } = new List<StockUploadValuation>();
 
     public List<StockTearSheetOutput> StockTearSheetOutputs { get; set; } = new List<StockTearSheetOutput>();
 
